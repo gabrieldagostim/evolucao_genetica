@@ -14,18 +14,18 @@ from individuos import (
 
 LARGURA_TELA = 1000
 ALTURA_TELA = 600
-FPS = 18
-RAIO_INDIVIDUO = 5
+FPS = 60
+RAIO_INDIVIDUO = 4
 
 
 # --- PARAMETROS SIMULACAO ---
-INTENSIDADE_MIGRACAO = 50       
-NUMERO_DE_ANOS = 20000
+INTENSIDADE_MIGRACAO = 0     
+NUMERO_DE_ANOS = 4000
 IDADE_REPRODUTIVA = 10
 
 QTD_FONTES_POR_BIOMA = 1
-RAIO_FONTE_RECURSO = 80
-INTENSIDADE_MOV_RECURSO = 5
+RAIO_FONTE_RECURSO = 45
+INTENSIDADE_MOV_RECURSO = 10
 INTENSIDADE_VARIACAO_COR = 0
 
 class Camera:
@@ -119,16 +119,18 @@ def mover_populacao(populacao: list[Individuo]):
         individuo.energia -= CUSTO_MOVIMENTO
 
 
-def variar_cores_biomas(ambiente: Ambiente, intensidade: int):
+def variar_cores_biomas(ambiente: Ambiente, intensidade: int, ano:int):
     """Altera sutilmente a cor de cada bioma a cada ano."""
-    for bioma in ambiente.biomas:
-        dr = random.randint(-intensidade, intensidade)
-        dg = random.randint(-intensidade, intensidade)
-        db = random.randint(-intensidade, intensidade)
+    
+    if (ano // 16 == 0):
+        for bioma in ambiente.biomas:
+            dr = random.randint(-intensidade, intensidade)
+            dg = random.randint(-intensidade, intensidade)
+            db = random.randint(-intensidade, intensidade)
 
-        bioma.cor.r = max(0, min(255, bioma.cor.r + dr))
-        bioma.cor.g = max(0, min(255, bioma.cor.g + dg))
-        bioma.cor.b = max(0, min(255, bioma.cor.b + db))
+            bioma.cor.r = max(0, min(255, bioma.cor.r + dr))
+            bioma.cor.g = max(0, min(255, bioma.cor.g + dg))
+            bioma.cor.b = max(0, min(255, bioma.cor.b + db))
 
 # --- FUNÇÕES DE DENSENHO ---
 
@@ -204,22 +206,22 @@ def main():
     
     camera = Camera()
     
-    maritimo  = Bioma('marítimo',  0.10, Cor(28, 107, 160), energia_fornecida=50)
-    polar     = Bioma('polar',     0.5, Cor(102, 183, 255), energia_fornecida=200)
-    floresta  = Bioma('floresta',  0.20, Cor(34, 139, 34), energia_fornecida=40)
-    desertico = Bioma('desértico', 0.20, Cor(237, 201, 175), energia_fornecida=90)
-    savanna   = Bioma('savanna',   0.5, Cor(189, 183, 107), energia_fornecida=200)
-    pantano   = Bioma('pântano',   0.5, Cor(47, 79, 79), energia_fornecida=200)
-    montanha  = Bioma('montanha',  0.10, Cor(139, 137, 137), energia_fornecida=20)
-    tundra    = Bioma('tundra',    0.5, Cor(176, 224, 230), energia_fornecida=200)
-    planicie  = Bioma('planície',  0.10, Cor(144, 238, 144), energia_fornecida=20)
-    vulcanico = Bioma('vulcânico', 0.10, Cor(178, 34, 34), energia_fornecida=90)
+    polar     = Bioma('polar',     0.25, Cor(102, 183, 255), energia_fornecida=200)
+    floresta  = Bioma('floresta',  0.23, Cor(34, 139, 34), energia_fornecida=40)
+    maritimo  = Bioma('marítimo',  0.25, Cor(28, 107, 160), energia_fornecida=50)
+    desertico = Bioma('desértico', 0.27, Cor(237, 201, 175), energia_fornecida=90)
+    # savanna   = Bioma('savanna',   0.5, Cor(189, 183, 107), energia_fornecida=200)
+    # pantano   = Bioma('pântano',   0.5, Cor(47, 79, 79), energia_fornecida=200)
+    # montanha  = Bioma('montanha',  0.10, Cor(139, 137, 137), energia_fornecida=20)
+    # tundra    = Bioma('tundra',    0.5, Cor(176, 224, 230), energia_fornecida=200)
+    # planicie  = Bioma('planície',  0.10, Cor(144, 238, 144), energia_fornecida=20)
+    # vulcanico = Bioma('vulcânico', 0.10, Cor(178, 34, 34), energia_fornecida=90)
 
     ambiente = Ambiente(
         AMBIENTE_X_MAX, AMBIENTE_Y_MAX,
         [
             maritimo, floresta, desertico, polar,
-            savanna, pantano, montanha, tundra, planicie, vulcanico
+            # savanna, pantano, montanha, tundra, planicie, vulcanico
         ]
     )
     
@@ -256,7 +258,7 @@ def main():
         for bioma in ambiente.biomas:
             for fonte_obj in bioma.fontes_de_recurso:
                 fonte_obj.mover(bioma.limites, INTENSIDADE_MOV_RECURSO)
-        variar_cores_biomas(ambiente, INTENSIDADE_VARIACAO_COR)
+        variar_cores_biomas(ambiente, INTENSIDADE_VARIACAO_COR, ano_atual)
         
         # 1. Envelhecer e alimentar a população
         for individuo in populacao: 
@@ -384,15 +386,17 @@ def main():
         ano_atual += 1
     
     print("\n--- SALVANDO DADOS GRANULARES DA SIMULAÇÃO ---")
-    if dados_individuais_log:
-        df_simulacao = pd.DataFrame(dados_individuais_log)
-        
-        # Salva em CSV, que é muito mais eficiente para arquivos grandes
-        nome_arquivo_csv = "dados_individuais_simulacao.csv"
-        df_simulacao.to_csv(nome_arquivo_csv, index=False)
-        print(f"Dados salvos com sucesso em '{nome_arquivo_csv}'")
-    else:
-        print("Nenhum dado foi gerado para salvar.")
+    
+    if False:
+        if dados_individuais_log:
+            df_simulacao = pd.DataFrame(dados_individuais_log)
+            
+            # Salva em CSV, que é muito mais eficiente para arquivos grandes
+            nome_arquivo_csv = "dados_individuais_simulacao.csv"
+            df_simulacao.to_csv(nome_arquivo_csv, index=False)
+            print(f"Dados salvos com sucesso em '{nome_arquivo_csv}'")
+        else:
+            print("Nenhum dado foi gerado para salvar.")
     
     print("\n--- SIMULAÇÃO FINALIZADA ---")
     print("A janela final está sendo exibida. Pressione qualquer tecla para fechar.")

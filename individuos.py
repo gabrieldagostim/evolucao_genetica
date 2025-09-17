@@ -3,14 +3,14 @@
 import random
 import math
 
-QTD_MAX_INDIVIDUOS = 10000
-QTD_INICIAL_INDIVIDUOS = 1500
+QTD_MAX_INDIVIDUOS = 5000
+QTD_INICIAL_INDIVIDUOS = 2000
 IDADE_MAX = 85                  
 INTERVALO_REPRODUCAO = 3
 TAXA_MUTACAO = 0.080            
-INTENSIDADE_MUTACAO = 50      
-DISTANCIA_REPRODUCAO = 100
-FATOR_SOBREVIVENCIA = 1.4
+INTENSIDADE_MUTACAO = 30      
+DISTANCIA_REPRODUCAO = 50
+FATOR_SOBREVIVENCIA = 0.5
 
 AMBIENTE_X_MAX = 1000
 AMBIENTE_Y_MAX = 600
@@ -19,7 +19,7 @@ MAX_DISTANCIA_COR = 441.67
 ENERGIA_MAXIMA = 500           
 ENERGIA_INICIAL = 200
 CUSTO_MOVIMENTO = 2           
-CUSTO_REPRODUCAO = 5
+CUSTO_REPRODUCAO = 50
 
 
 class Cor():
@@ -193,6 +193,7 @@ class SelecaoNatural():
         probabilidade_ajustada = probabilidade_base * self.fator_de_pressao
     
         return max(0.0, min(1.0, probabilidade_ajustada))
+
 
     def aplicar_selecao(self, populacao: list[Individuo]) -> list[Individuo]:
         '''Filtra populacao, retornando uma nova lista apenas com os sobreviventes.'''
